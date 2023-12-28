@@ -9,7 +9,6 @@
                 using (var provider = new TestProvider(assembly))
                 {
                     var testGroups = provider.GetTests();
-
                     foreach (var group in testGroups)
                     {
                         group.Run();
