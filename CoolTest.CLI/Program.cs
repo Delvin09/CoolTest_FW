@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace CoolTest.CLI
+﻿namespace CoolTest.CLI
 {
     internal class Program
     {
