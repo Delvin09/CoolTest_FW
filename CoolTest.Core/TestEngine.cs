@@ -6,12 +6,14 @@
         {
             foreach (var assembly in assemblies)
             {
-                var provider = new TestProvider(assembly);
-                var testGroups = provider.GetTests();
-
-                foreach (var group in testGroups)
+                using (var provider = new TestProvider(assembly))
                 {
-                    group.Run();
+                    var testGroups = provider.GetTests();
+
+                    foreach (var group in testGroups)
+                    {
+                        group.Run();
+                    }
                 }
             }
         }
