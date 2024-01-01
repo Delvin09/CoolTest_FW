@@ -50,8 +50,22 @@ namespace CoolTest.Core
                                 .ToImmutableArray()
                     }
                 );
-
+            foreach ( var group in result ) 
+            {
+                group.BeforeRun += Group_AfterRun;
+                group.AfterRun += Group_AfterRun;
+            }
             return result;
+        }
+
+        private void Group_BeforeRun(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Testing started in group: '{((TestGroup)sender).Name}'");
+        }
+
+        private void Group_AfterRun(object sender, EventArgs e)
+        {
+            Console.WriteLine($"Testing finished in group: '{((TestGroup)sender).Name}'");
         }
 
         private Assembly? _context_Resolving(AssemblyLoadContext ctx, AssemblyName name)
