@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-
+using CoolTest.Core;
 namespace CoolTest.CLI
 {
     internal class Program
@@ -7,7 +7,11 @@ namespace CoolTest.CLI
         static void Main(string[] args)
         {
             var engine = new Core.TestEngine();
-            engine.Run(args);
+            List<TestResult> tests = engine.Run(args);
+            foreach (TestResult result in tests)
+            {
+                result.DisplayResults();
+            }
         }
     }
 }

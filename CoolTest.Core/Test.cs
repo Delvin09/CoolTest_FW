@@ -8,16 +8,22 @@ namespace CoolTest.Core
 
         public MethodInfo Method { get; set; }
 
-        public void Run(object subject)
+        public void Run(object subject, GroupTestResult groupTestResult)
         {
+            SingleTestResult singleTestResult = groupTestResult.RunSingleTest(Method.Name);
             try
             {
+                singleTestResult.TestState = Abstarctions.TestState.Pending;
                 Method.Invoke(subject, null);
+                singleTestResult.TestState = Abstarctions.TestState.Success;
             }
             catch (Exception ex)
             {
-                //TODO: handle ex to results
+                singleTestResult.TestState = Abstarctions.TestState.Failed;
+                singleTestResult.ExceptionMessage = ex.InnerException.Message;
             }
+
+            singleTestResult.End();
         }
     }
 }
