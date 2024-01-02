@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using CoolTest.Core;
+﻿using CoolTest.Abstarctions.TestResults;
 namespace CoolTest.CLI
 {
     internal class Program

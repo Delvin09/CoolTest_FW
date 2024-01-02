@@ -1,4 +1,5 @@
-﻿namespace CoolTest.Core
+﻿using CoolTest.Abstarctions.TestResults;
+namespace CoolTest.Core
 {
     public class TestEngine
     {
@@ -13,9 +14,7 @@
                     var testGroups = provider.GetTests();
                     foreach (var group in testGroups)
                     {
-                        var groupTest = testResult.RunGroupTest(group.Name);
-                        group.Run(groupTest);
-                        groupTest.End();
+                        group.Run(testResult, group.Name);
                     }
                     testResult.End();
                     tests.Add(testResult);

@@ -1,13 +1,12 @@
-﻿using CoolTest.Abstarctions;
-
-namespace CoolTest.Core
+﻿namespace CoolTest.Abstarctions.TestResults
 {
     public class TestResult
     {
         public double Duration { get; set; }
 
         private List<GroupTestResult> GroupList = new List<GroupTestResult>();
-        public GroupTestResult RunGroupTest(string name) {
+        public GroupTestResult RunGroupTest(string name)
+        {
             GroupTestResult group = new GroupTestResult(name);
             GroupList.Add(group);
             return group;
@@ -19,8 +18,6 @@ namespace CoolTest.Core
         }
         public void DisplayResults()
         {
-            Console.WriteLine($"Total duration: {Duration}");
-            Console.WriteLine("");
             foreach (var group in GroupList)
             {
                 Console.Write($"{group.Name}: ");
@@ -65,59 +62,16 @@ namespace CoolTest.Core
                     Console.SetCursorPosition(45, Console.CursorTop);
                     Console.Write($"{item.Duration}s");
 
-                    if (!string.IsNullOrEmpty(item.ExceptionMessage))
+                    if (item.Exception != null && !string.IsNullOrEmpty(item.Exception.Message))
                     {
                         Console.SetCursorPosition(65, Console.CursorTop);
-                        Console.Write($"{item.ExceptionMessage}");
+                        Console.Write($"{item.Exception.Message}");
                     }
                     Console.WriteLine(" ");
                 }
 
                 Console.WriteLine(" ");
             }
-        }
-    }
-
-    public class GroupTestResult : SingleTestResult
-    {
-        public List<SingleTestResult> TestList = new List<SingleTestResult>();
-
-        public GroupTestResult(string name) : base(name) { }
-
-        public SingleTestResult RunSingleTest(string name)
-        {
-            SingleTestResult test = new SingleTestResult(name);
-            TestList.Add(test);
-            return test;
-        }
-
-        public override void End()
-        {
-            Duration = (DateTime.Now - StartTime).TotalSeconds;
-            TestState = TestList.All(test => test.TestState == TestState.Success) ? TestState.Success : TestState.Failed;
-        }
-    }
-
-    public class SingleTestResult
-    {
-        public string Name { get; set; }
-
-        public double Duration { get; protected set; }
-
-        public string ExceptionMessage { get; set; }
-
-        protected DateTime StartTime { get; set; }
-
-        public TestState TestState { get; set; }
-
-        public SingleTestResult(string name)
-        {
-            StartTime = DateTime.Now;
-            Name = name;
-        }
-        public virtual void End()
-        {
-            Duration = (DateTime.Now - StartTime).TotalSeconds;
         }
     }
 }
