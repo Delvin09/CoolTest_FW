@@ -6,9 +6,15 @@ namespace CoolTest.Core
 {
     internal class Test
     {
-        public string Name { get; set; }
+        public Test(string name, MethodInfo method)
+        {
+            Name = name;
+            Method = method;
+        }
 
-        public MethodInfo Method { get; set; }
+        public string Name { get; }
+
+        public MethodInfo Method { get; }
 
         public SingleTestResult Run(object subject)
         {

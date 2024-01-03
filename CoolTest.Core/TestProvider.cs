@@ -36,17 +36,11 @@ namespace CoolTest.Core
             var result = _assembly.GetTypes()
                 .Where(t => t.GetCustomAttribute<TestGroupAttribute>() != null)
                 .Select(t =>
-                    new TestGroup
+                    new TestGroup(t.GetCustomAttribute<TestGroupAttribute>()?.Name ?? t.Name, t)
                     {
-                        Name = t.GetCustomAttribute<TestGroupAttribute>()?.Name ?? t.Name,
-                        Type = t,
                         Tests = t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                                 .Where(m => m.GetCustomAttribute<TestAttribute>() != null)
-                                .Select(m => new Test
-                                {
-                                    Method = m,
-                                    Name = m.GetCustomAttribute<TestAttribute>()?.Name ?? m.Name
-                                })
+                                .Select(m => new Test(m.GetCustomAttribute<TestAttribute>()?.Name ?? m.Name, m))
                                 .ToImmutableArray()
                     }
                 );
@@ -57,6 +51,8 @@ namespace CoolTest.Core
         private Assembly? _context_Resolving(AssemblyLoadContext ctx, AssemblyName name)
         {
             var dirName = Path.GetDirectoryName(_assemblyPath);
+            if (string.IsNullOrEmpty(dirName) || string.IsNullOrEmpty(name.Name)) return null;
+
             var assemblyPath = Path.Combine(dirName, name.Name);
             assemblyPath = assemblyPath += ".dll";
             return ctx.LoadFromAssemblyPath(assemblyPath);
