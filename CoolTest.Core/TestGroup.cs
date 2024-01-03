@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using CoolTest.Abstarctions.TestResults;
 
 namespace CoolTest.Core
 {
@@ -16,15 +17,20 @@ namespace CoolTest.Core
 
         public ImmutableArray<Test> Tests { get; init; }
 
-        public void Run()
+        public GroupTestResult Run(string name)
         {
-            foreach (var test in Tests)
+            return TestResult.Create<GroupTestResult>(name, groupTest =>
             {
-                var subject = Activator.CreateInstance(Type);
-                if (subject == null) throw new InvalidOperationException("Can't create the object of test class!");
+                foreach (var test in Tests)
+                {
+                    var subject = Activator.CreateInstance(Type);
+                    if (subject == null) throw new InvalidOperationException("Can't create the object of test class!");
+                    SingleTestResult testResult = test.Run(subject);
 
-                test.Run(subject);
-            }
+                    groupTest.TestList.Add(testResult);
+                }
+                return groupTest;
+            });
         }
     }
 }

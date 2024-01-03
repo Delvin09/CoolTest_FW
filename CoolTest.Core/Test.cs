@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using CoolTest.Abstarctions.TestResults;
+using CoolTest.Abstarctions;
+using System.Reflection;
 
 namespace CoolTest.Core
 {
@@ -14,16 +16,38 @@ namespace CoolTest.Core
 
         public MethodInfo Method { get; }
 
-        public void Run(object subject)
+        public SingleTestResult Run(object subject)
         {
-            try
+            return TestResult.Create<SingleTestResult>(Method.Name, testResult =>
             {
-                Method.Invoke(subject, null);
-            }
-            catch (Exception ex)
-            {
-                //TODO: handle ex to results
-            }
+                try
+                {
+                    testResult.TestState = TestState.Pending;
+                    Method.Invoke(subject, null);
+                    testResult.TestState = TestState.Success;
+                    return testResult;
+                }
+                catch (TargetInvocationException ex)
+                {
+                    if (ex.InnerException is AssertFailException)
+                    {
+                        testResult.TestState = TestState.Failed;
+                        testResult.Exception = ex.InnerException;
+                    }
+                    else
+                    {
+                        testResult.TestState = TestState.Error;
+                        testResult.Exception = ex;
+                    }
+                    return testResult;
+                }
+                catch (Exception ex)
+                {
+                    testResult.TestState = TestState.Error;
+                    testResult.Exception = ex;
+                    return testResult;
+                }
+            });
         }
     }
 }
