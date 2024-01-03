@@ -8,13 +8,17 @@ namespace CoolTest.Abstarctions.TestResults
 
         public TimeSpan Duration { get { return (EndTime - StartTime); } }
 
-        public Exception Exception { get; set; }
+        public Exception Exception { private get; set; }
+
+        public string ExceptionMessage { get { return Exception == null ? "" : Exception.Message; } }
 
         protected DateTime StartTime { get; set; }
 
         protected DateTime EndTime { get; set; }
 
-        public TestState TestState { get; set; }
+        public TestState TestState { protected get; set; }
+
+        public string Status { get { return TestState.ToString(); } }
 
         public SingleTestResult()
         {

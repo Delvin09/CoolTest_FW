@@ -4,8 +4,8 @@
     {
         string Name { get; set; }
         TimeSpan Duration { get; }
-        Exception Exception { get; set; }
-        TestState TestState { get; set; }
+        string ExceptionMessage { get; }
+        string Status { get; }
 
         void End();
     }

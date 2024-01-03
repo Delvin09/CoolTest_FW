@@ -7,6 +7,7 @@ namespace CoolTest.CLI
         {
             var engine = new Core.TestEngine();
             TestResult testResult = engine.Run(args);
+            testResult.SaveToFile();
         }
     }
 }
