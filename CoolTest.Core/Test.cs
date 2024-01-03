@@ -1,13 +1,16 @@
-﻿using System.Reflection;
+﻿using CoolTest.Core.Logger;
+using System.Reflection;
 
 namespace CoolTest.Core
 {
     internal class Test
     {
-        public Test(string name, MethodInfo method)
+        private ILogger _logger { get; set; }
+        public Test(string name, MethodInfo method, ILogger logger)
         {
             Name = name;
             Method = method;
+            _logger = logger;
         }
 
         public string Name { get; }
@@ -22,7 +25,7 @@ namespace CoolTest.Core
             }
             catch (Exception ex)
             {
-                //TODO: handle ex to results
+                _logger.LogError(ex);
             }
         }
     }
