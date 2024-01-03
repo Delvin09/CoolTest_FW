@@ -12,6 +12,8 @@ namespace CoolTest.Core
 
         private readonly Assembly _assembly;
 
+        public string ModuleName { get { return _assembly.ManifestModule.Name; }}
+
         public TestProvider(string assemblyPath)
         {
             this._assemblyPath = assemblyPath;

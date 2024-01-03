@@ -2,7 +2,7 @@
   "profiles": {
     "CoolTest.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\Projects\\newtest\\DataStructers\\DataStructers\\bin\\Debug\\net7.0\\DataStructers.dll"
+      "commandLineArgs": "D:\\Courses\\DataStructers\\DataStructers\\bin\\Debug\\net7.0\\DataStructers.dll"
     }
   }
 }

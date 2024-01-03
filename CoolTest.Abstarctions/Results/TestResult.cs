@@ -10,7 +10,7 @@ namespace CoolTest.Abstarctions.TestResults
 
         private DateTime EndTime { get; set; }
 
-        public List<GroupTestResult> GroupList = new List<GroupTestResult>();
+        public List<AssemblyTestResult> AssemblyList = new List<AssemblyTestResult>();
 
         public TestResult()
         {
