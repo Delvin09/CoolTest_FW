@@ -1,10 +1,12 @@
-﻿namespace CoolTest.Abstarctions.TestResults
+﻿using CoolTest.Abstarctions.Results;
+
+namespace CoolTest.Abstarctions.TestResults
 {
-    public class SingleTestResult
+    public class SingleTestResult : ITestResult
     {
         public string Name { get; set; }
 
-        public double Duration { get { return (EndTime - StartTime).TotalSeconds; } }
+        public TimeSpan Duration { get { return (EndTime - StartTime); } }
 
         public Exception Exception { get; set; }
 
@@ -14,10 +16,9 @@
 
         public TestState TestState { get; set; }
 
-        public SingleTestResult(string name)
+        public SingleTestResult()
         {
             StartTime = DateTime.Now;
-            Name = name;
         }
         public virtual void End()
         {

@@ -1,17 +1,12 @@
-﻿namespace CoolTest.Abstarctions.TestResults
+﻿using CoolTest.Abstarctions.Results;
+
+namespace CoolTest.Abstarctions.TestResults
 {
     public class GroupTestResult : SingleTestResult
     {
         public List<SingleTestResult> TestList = new List<SingleTestResult>();
 
-        public GroupTestResult(string name) : base(name) { }
-
-        public SingleTestResult RunSingleTest(string name)
-        {
-            SingleTestResult test = new SingleTestResult(name);
-            TestList.Add(test);
-            return test;
-        }
+        public GroupTestResult() : base() { }
 
         public override void End()
         {

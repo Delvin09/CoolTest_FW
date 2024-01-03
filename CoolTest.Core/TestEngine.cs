@@ -14,7 +14,8 @@ namespace CoolTest.Core
                     var testGroups = provider.GetTests();
                     foreach (var group in testGroups)
                     {
-                        group.Run(testResult, group.Name);
+                        GroupTestResult groupTest = group.Run(group.Name);
+                        testResult.GroupList.Add(groupTest);
                     }
                     testResult.End();
                     tests.Add(testResult);

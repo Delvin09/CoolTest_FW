@@ -11,16 +11,20 @@ namespace CoolTest.Core
         public Type Type { get; set; }
         public ImmutableArray<Test> Tests { get; set; }
 
-        public void Run(TestResult testResult, string name)
+        public GroupTestResult Run(string name)
         {
-            GroupTestResult groupTestResult = testResult.RunGroupTest(name);
-            foreach (var test in Tests)
+            return TestResult.Create<GroupTestResult>(name, groupTest =>
             {
-                var subject = Activator.CreateInstance(Type);
+                foreach (var test in Tests)
+                {
+                    var subject = Activator.CreateInstance(Type);
 
-                test.Run(subject, groupTestResult);
-            }
-            groupTestResult.End();
+                    SingleTestResult testResult = test.Run(subject);
+
+                    groupTest.TestList.Add(testResult);
+                }
+                return groupTest;
+            });
         }
     }
 }

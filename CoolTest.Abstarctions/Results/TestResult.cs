@@ -1,77 +1,34 @@
-﻿namespace CoolTest.Abstarctions.TestResults
+﻿using CoolTest.Abstarctions.Results;
+
+namespace CoolTest.Abstarctions.TestResults
 {
     public class TestResult
     {
-        public double Duration { get; set; }
+        public TimeSpan Duration { get { return (EndTime - StartTime); } }
 
-        private List<GroupTestResult> GroupList = new List<GroupTestResult>();
-        public GroupTestResult RunGroupTest(string name)
+        private DateTime StartTime { get; set; }
+
+        private DateTime EndTime { get; set; }
+
+        public List<GroupTestResult> GroupList = new List<GroupTestResult>();
+
+        public TestResult()
         {
-            GroupTestResult group = new GroupTestResult(name);
-            GroupList.Add(group);
-            return group;
+            StartTime = DateTime.Now;
         }
 
         public void End()
         {
-            Duration = GroupList.Sum(group => group.Duration);
+            EndTime = DateTime.Now;
         }
-        public void DisplayResults()
+
+        public static T Create<T>(string name, Func<T, T> func) 
+            where T : ITestResult, new()
         {
-            foreach (var group in GroupList)
-            {
-                Console.Write($"{group.Name}: ");
-
-                if (group.TestState == TestState.Success)
-                {
-                    Console.BackgroundColor = ConsoleColor.Green;
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                else
-                {
-                    Console.BackgroundColor = ConsoleColor.Red;
-                    Console.ForegroundColor = ConsoleColor.White;
-                }
-                Console.SetCursorPosition(25, Console.CursorTop);
-                Console.Write($"{group.TestState}");
-                Console.ResetColor();
-
-                Console.SetCursorPosition(45, Console.CursorTop);
-                Console.Write($"{group.Duration}s");
-
-                Console.WriteLine(" ");
-                foreach (var item in group.TestList)
-                {
-                    Console.SetCursorPosition(5, Console.CursorTop);
-                    Console.Write($"{item.Name}: ");
-
-                    if (item.TestState == TestState.Success)
-                    {
-                        Console.BackgroundColor = ConsoleColor.Green;
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                    else
-                    {
-                        Console.BackgroundColor = ConsoleColor.Red;
-                        Console.ForegroundColor = ConsoleColor.White;
-                    }
-                    Console.SetCursorPosition(25, Console.CursorTop);
-                    Console.Write($"{item.TestState}");
-                    Console.ResetColor();
-
-                    Console.SetCursorPosition(45, Console.CursorTop);
-                    Console.Write($"{item.Duration}s");
-
-                    if (item.Exception != null && !string.IsNullOrEmpty(item.Exception.Message))
-                    {
-                        Console.SetCursorPosition(65, Console.CursorTop);
-                        Console.Write($"{item.Exception.Message}");
-                    }
-                    Console.WriteLine(" ");
-                }
-
-                Console.WriteLine(" ");
-            }
+            T instance = new T() { Name = name };
+            func(instance);
+            instance.End();
+            return instance;
         }
     }
 }

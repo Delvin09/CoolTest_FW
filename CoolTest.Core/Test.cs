@@ -10,34 +10,38 @@ namespace CoolTest.Core
 
         public MethodInfo Method { get; set; }
 
-        public void Run(object subject, GroupTestResult groupTestResult)
+        public SingleTestResult Run(object subject)
         {
-            SingleTestResult singleTestResult = groupTestResult.RunSingleTest(Method.Name);
-            try
+            return TestResult.Create<SingleTestResult>(Method.Name, testResult =>
             {
-                singleTestResult.TestState = TestState.Pending;
-                Method.Invoke(subject, null);
-                singleTestResult.TestState = TestState.Success;
-            }
-            catch (TargetInvocationException ex)
-            {
-                if (ex.InnerException is AssertFailException)
+                try
                 {
-                    singleTestResult.TestState = TestState.Failed;
-                    singleTestResult.Exception = ex.InnerException;
-                } else
-                {
-                    singleTestResult.TestState = TestState.Error;
-                    singleTestResult.Exception = ex;
+                    testResult.TestState = TestState.Pending;
+                    Method.Invoke(subject, null);
+                    testResult.TestState = TestState.Success;
+                    return testResult;
                 }
-            }
-            catch (Exception ex)
-            {
-                singleTestResult.TestState = TestState.Error;
-                singleTestResult.Exception = ex;
-            }
-
-            singleTestResult.End();
+                catch (TargetInvocationException ex)
+                {
+                    if (ex.InnerException is AssertFailException)
+                    {
+                        testResult.TestState = TestState.Failed;
+                        testResult.Exception = ex.InnerException;
+                    }
+                    else
+                    {
+                        testResult.TestState = TestState.Error;
+                        testResult.Exception = ex;
+                    }
+                    return testResult;
+                }
+                catch (Exception ex)
+                {
+                    testResult.TestState = TestState.Error;
+                    testResult.Exception = ex;
+                    return testResult;
+                }
+            });
         }
     }
 }
