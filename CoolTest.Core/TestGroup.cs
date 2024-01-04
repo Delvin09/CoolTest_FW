@@ -1,6 +1,6 @@
 using CoolTest.Core.Logger;
 using System.Collections.Immutable;
-using CoolTest.Abstarctions.TestResults;
+using CoolTest.Abstarctions.Results;
 
 namespace CoolTest.Core
 {

@@ -13,6 +13,8 @@ namespace CoolTest.Core
 
         private readonly Assembly _assembly;
 
+        public string? ModuleName { get { return _assembly.FullName; }}
+
         private readonly ILogger _logger;
 
         public TestProvider(string assemblyPath, ILogger logger)
@@ -66,7 +68,7 @@ namespace CoolTest.Core
 
             var assemblyPath = Path.Combine(dirName, name.Name);
             assemblyPath += ".dll";
-            
+
             var ass = ctx.LoadFromAssemblyPath(assemblyPath);
 
             _logger.LogInfo($"Assembly {assemblyPath} loaded");

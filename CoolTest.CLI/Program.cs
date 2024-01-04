@@ -1,4 +1,5 @@
 ﻿using CoolTest.Core.Logger;
+using CoolTest.Abstarctions.Results;
 
 namespace CoolTest.CLI
 {
@@ -7,7 +8,8 @@ namespace CoolTest.CLI
         static void Main(string[] args)
         {
             var engine = new Core.TestEngine(new Logger());
-            engine.Run(args);
+            TestResult testResult = engine.Run(args);
+            testResult.SaveToFile();
         }
     }
 }

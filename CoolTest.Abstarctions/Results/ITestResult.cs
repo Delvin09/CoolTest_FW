@@ -2,10 +2,13 @@
 {
     public interface ITestResult
     {
-        string Name { get; set; }
+        string? Name { get; set; }
+
         TimeSpan Duration { get; }
-        Exception Exception { get; set; }
-        TestState TestState { get; set; }
+
+        string Status { get; }
+
+        ExceptionInfo ExceptionInfo { get; }
 
         void End();
     }

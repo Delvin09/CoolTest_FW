@@ -1,20 +1,22 @@
-﻿using CoolTest.Abstarctions.Results;
-
-namespace CoolTest.Abstarctions.TestResults
+﻿namespace CoolTest.Abstarctions.Results
 {
     public class SingleTestResult : ITestResult
     {
-        public string Name { get; set; }
+        public string? Name { get; set; } = string.Empty;
 
         public TimeSpan Duration { get { return (EndTime - StartTime); } }
 
-        public Exception Exception { get; set; }
+        public Exception? Exception { private get; set; }
+
+        public ExceptionInfo ExceptionInfo { get { return new ExceptionInfo(Exception); }}
 
         protected DateTime StartTime { get; set; }
 
         protected DateTime EndTime { get; set; }
 
-        public TestState TestState { get; set; }
+        public TestState TestState { protected get; set; }
+
+        public string Status { get { return TestState.ToString(); } }
 
         public SingleTestResult()
         {
