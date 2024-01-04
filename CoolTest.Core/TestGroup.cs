@@ -1,14 +1,18 @@
-﻿using System.Collections.Immutable;
+using CoolTest.Core.Logger;
+using System.Collections.Immutable;
 using CoolTest.Abstarctions.TestResults;
 
 namespace CoolTest.Core
 {
     internal class TestGroup
     {
-        public TestGroup(string name, Type type)
+        private readonly ILogger _logger;
+
+        public TestGroup(string name, Type type, ILogger logger)
         {
             Name = name;
             Type = type;
+            _logger = logger;
         }
 
         public string Name { get; }
@@ -24,7 +28,12 @@ namespace CoolTest.Core
                 foreach (var test in Tests)
                 {
                     var subject = Activator.CreateInstance(Type);
-                    if (subject == null) throw new InvalidOperationException("Can't create the object of test class!");
+                    if (subject == null)
+                    {
+                        var ex = new InvalidOperationException("Can't create the object of test class!");
+                        _logger.LogError(ex);
+                        throw ex;
+                    }
                     SingleTestResult testResult = test.Run(subject);
 
                     groupTest.TestList.Add(testResult);
