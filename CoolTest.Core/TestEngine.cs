@@ -1,6 +1,5 @@
 ﻿using CoolTest.Core.Logger;
 using CoolTest.Abstarctions.Results;
-using CoolTest.Abstarctions.TestResults;
 
 namespace CoolTest.Core
 {
@@ -15,7 +14,7 @@ namespace CoolTest.Core
         public TestResult Run(string[] assemblies)
         {
             _logger.LogInfo($"CoolTest engine started!");
-            TestResult testResult = new TestResult();
+            TestResult testResult = new TestResult(_logger);
             foreach (var assembly in assemblies)
             {
                 _logger.LogInfo($"Loading assembly {assembly}");

@@ -1,5 +1,5 @@
 ﻿using CoolTest.Core.Logger;
-using CoolTest.Abstarctions.TestResults;
+using CoolTest.Abstarctions.Results;
 
 namespace CoolTest.CLI
 {

@@ -1,5 +1,5 @@
 using CoolTest.Core.Logger;
-using CoolTest.Abstarctions.TestResults;
+using CoolTest.Abstarctions.Results;
 using CoolTest.Abstarctions;
 using System.Reflection;
 

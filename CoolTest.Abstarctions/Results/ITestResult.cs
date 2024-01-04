@@ -1,6 +1,4 @@
-﻿using CoolTest.Abstarctions.TestResults;
-
-namespace CoolTest.Abstarctions.Results
+﻿namespace CoolTest.Abstarctions.Results
 {
     public interface ITestResult
     {

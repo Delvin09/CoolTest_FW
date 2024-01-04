@@ -1,4 +1,4 @@
-﻿namespace CoolTest.Abstarctions.TestResults
+﻿namespace CoolTest.Abstarctions.Results
 {
     public class GroupTestResult : SingleTestResult
     {
