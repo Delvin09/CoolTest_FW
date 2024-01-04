@@ -23,6 +23,7 @@ namespace CoolTest.Core
             _logger = logger;
 
             _context.Resolving += _context_Resolving;
+            _logger.LogInfo("TestProvider created");
         }
 
         public void Dispose()
@@ -31,6 +32,7 @@ namespace CoolTest.Core
             {
                 _context.Resolving -= _context_Resolving;
                 _context.Unload();
+                _logger.LogInfo("TestProvider disposed");
             }
             catch (Exception ex)
             {
@@ -52,6 +54,8 @@ namespace CoolTest.Core
                     }
                 );
 
+            _logger.LogInfo($"Received lists of tests for {result.Count()} test groups");
+
             return result;
         }
 
@@ -62,7 +66,12 @@ namespace CoolTest.Core
 
             var assemblyPath = Path.Combine(dirName, name.Name);
             assemblyPath += ".dll";
-            return ctx.LoadFromAssemblyPath(assemblyPath);
+            
+            var ass = ctx.LoadFromAssemblyPath(assemblyPath);
+
+            _logger.LogInfo($"Assembly {assemblyPath} loaded");
+
+            return ass;
         }
     }
 }

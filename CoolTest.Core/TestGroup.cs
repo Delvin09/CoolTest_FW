@@ -5,6 +5,8 @@ namespace CoolTest.Core
 {
     internal class TestGroup
     {
+        private readonly ILogger _logger;
+
         public TestGroup(string name, Type type, ILogger logger)
         {
             Name = name;
@@ -16,8 +18,6 @@ namespace CoolTest.Core
 
         public Type Type { get; }
 
-        private readonly ILogger _logger;
-
         public ImmutableArray<Test> Tests { get; init; }
 
         public void Run()
@@ -27,8 +27,9 @@ namespace CoolTest.Core
                 var subject = Activator.CreateInstance(Type);
                 if (subject == null)
                 {
-                    _logger.LogWarning(new InvalidOperationException("Can't create the object of test class!"));
-                    continue;
+                    var ex = new InvalidOperationException("Can't create the object of test class!");
+                    _logger.LogError(ex);
+                    throw ex;
                 }
 
                 test.Run(subject);

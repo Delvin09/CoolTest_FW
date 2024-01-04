@@ -4,10 +4,10 @@ namespace CoolTest.Core
 {
     public class TestEngine
     {
-        private ILogger _logger { get; set; }
+        private readonly ILogger _logger;
 
-        public TestEngine() {
-            _logger = new Logger.Logger();
+        public TestEngine(ILogger logger) {
+            _logger = logger;
         }
         
         public void Run(string[] assemblies)
@@ -19,10 +19,12 @@ namespace CoolTest.Core
                 using (var provider = new TestProvider(assembly, _logger))
                 {
                     var testGroups = provider.GetTests();
+
                     foreach (var group in testGroups)
                     {
                         _logger.LogInfo($"Run tests for test group {group}");
                         group.Run();
+                        _logger.LogInfo($"Finished tests for test group {group}");
                     }
                 }
             }
