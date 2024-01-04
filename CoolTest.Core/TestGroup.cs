@@ -1,5 +1,6 @@
-﻿using CoolTest.Core.Logger;
+using CoolTest.Core.Logger;
 using System.Collections.Immutable;
+using CoolTest.Abstarctions.TestResults;
 
 namespace CoolTest.Core
 {
@@ -20,20 +21,25 @@ namespace CoolTest.Core
 
         public ImmutableArray<Test> Tests { get; init; }
 
-        public void Run()
+        public GroupTestResult Run(string name)
         {
-            foreach (var test in Tests)
+            return TestResult.Create<GroupTestResult>(name, groupTest =>
             {
-                var subject = Activator.CreateInstance(Type);
-                if (subject == null)
+                foreach (var test in Tests)
                 {
-                    var ex = new InvalidOperationException("Can't create the object of test class!");
-                    _logger.LogError(ex);
-                    throw ex;
-                }
+                    var subject = Activator.CreateInstance(Type);
+                    if (subject == null)
+                    {
+                        var ex = new InvalidOperationException("Can't create the object of test class!");
+                        _logger.LogError(ex);
+                        throw ex;
+                    }
+                    SingleTestResult testResult = test.Run(subject);
 
-                test.Run(subject);
-            }
+                    groupTest.TestList.Add(testResult);
+                }
+                return groupTest;
+            });
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using CoolTest.Core.Logger;
+using CoolTest.Core.Logger;
+using CoolTest.Abstarctions.TestResults;
+using CoolTest.Abstarctions;
 using System.Reflection;
 
 namespace CoolTest.Core
@@ -17,18 +19,42 @@ namespace CoolTest.Core
 
         public MethodInfo Method { get; }
 
-        public void Run(object subject)
+        public SingleTestResult Run(object subject)
         {
-            try
+            return TestResult.Create<SingleTestResult>(Method.Name, testResult =>
             {
-                _logger.LogInfo($"Run test {Method.Name}");
-                Method.Invoke(subject, null);
-                _logger.LogInfo($"Finish test {Method.Name}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex);
-            }
+                try
+                {
+                    _logger.LogInfo($"Run test {Method.Name}");
+                    testResult.TestState = TestState.Pending;
+                    Method.Invoke(subject, null);
+                    testResult.TestState = TestState.Success;
+                    _logger.LogInfo($"Finish test {Method.Name}");
+                    return testResult;
+                }
+                catch (TargetInvocationException ex)
+                {
+                    _logger.LogError(ex);
+                    if (ex.InnerException is AssertFailException)
+                    {
+                        testResult.TestState = TestState.Failed;
+                        testResult.Exception = ex.InnerException;
+                    }
+                    else
+                    {
+                        testResult.TestState = TestState.Error;
+                        testResult.Exception = ex;
+                    }
+                    return testResult;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex);
+                    testResult.TestState = TestState.Error;
+                    testResult.Exception = ex;
+                    return testResult;
+                }
+            });
         }
     }
 }
