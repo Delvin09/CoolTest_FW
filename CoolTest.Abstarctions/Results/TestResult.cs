@@ -1,6 +1,6 @@
 ﻿using CoolTest.Abstarctions.Results;
 using System.Text.Json;
-using System.IO;
+using System.Text.RegularExpressions;
 
 namespace CoolTest.Abstarctions.TestResults
 {
@@ -12,9 +12,7 @@ namespace CoolTest.Abstarctions.TestResults
 
         private DateTime EndTime { get; set; }
 
-        public List<AssemblyTestResult> AssemblyList = new List<AssemblyTestResult>();
-
-        public AssemblyTestResult[] Results { get { return AssemblyList.ToArray<AssemblyTestResult>(); }}
+        public List<AssemblyTestResult> AssemblyList { get; private set; } = new List<AssemblyTestResult>();
 
         public TestResult()
         {
@@ -26,42 +24,15 @@ namespace CoolTest.Abstarctions.TestResults
             EndTime = DateTime.Now;
         }
 
-        private string ReadString(string message)
+        public void SaveToFile(string path = "")
         {
-            Console.Write(message);
-            string input = Console.ReadLine();
-            try
-            {
-                if (String.IsNullOrEmpty(input))
-                {
-                    Console.WriteLine("Field can not be empty");
-                    return ReadString(message);
-                }
-                return input;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return ReadString(message);
-            }
-
+            string fileName = $"TestResults-{Regex.Replace(DateTime.Now.ToString(), "[ :]", "-")}.json";
+            string filePath = Path.Combine(path == "" ? Directory.GetCurrentDirectory() : path, fileName);
+            string jsonData = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(filePath, jsonData);
         }
 
-        public void SaveToFile()
-        {
-            string answer = ReadString("Do you want save result of tests to file?(y/n)");
-
-            if (answer == "y")
-            {
-                string fileName = "TestResults.json";
-                string filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
-                string jsonData = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(filePath, jsonData);
-                Console.WriteLine("Data has been saved to 'TestResults.json'");
-            }
-        }
-
-        public static T Create<T>(string name, Func<T, T> func) 
+        public static T Create<T>(string? name, Func<T, T> func) 
             where T : ITestResult, new()
         {
             T instance = new T() { Name = name };

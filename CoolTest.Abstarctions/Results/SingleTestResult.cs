@@ -4,13 +4,13 @@ namespace CoolTest.Abstarctions.TestResults
 {
     public class SingleTestResult : ITestResult
     {
-        public string Name { get; set; }
+        public string? Name { get; set; } = string.Empty;
 
         public TimeSpan Duration { get { return (EndTime - StartTime); } }
 
-        public Exception Exception { private get; set; }
+        public Exception? Exception { private get; set; }
 
-        public string ExceptionMessage { get { return Exception == null ? "" : Exception.Message; } }
+        public ExceptionInfo ExceptionInfo { get { return new ExceptionInfo(Exception); }}
 
         protected DateTime StartTime { get; set; }
 

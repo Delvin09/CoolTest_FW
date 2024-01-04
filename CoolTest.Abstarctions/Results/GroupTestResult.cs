@@ -1,12 +1,8 @@
-﻿using System.Linq;
-
-namespace CoolTest.Abstarctions.TestResults
+﻿namespace CoolTest.Abstarctions.TestResults
 {
     public class GroupTestResult : SingleTestResult
     {
-        public List<SingleTestResult> TestList = new List<SingleTestResult>();
-
-        public SingleTestResult[] Results { get { return TestList.ToArray<SingleTestResult>(); } }
+        public List<SingleTestResult> TestList { get; private set; } = new List<SingleTestResult>();
 
         public GroupTestResult() : base() { }
 

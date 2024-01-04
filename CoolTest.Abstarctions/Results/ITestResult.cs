@@ -1,11 +1,16 @@
-﻿namespace CoolTest.Abstarctions.Results
+﻿using CoolTest.Abstarctions.TestResults;
+
+namespace CoolTest.Abstarctions.Results
 {
     public interface ITestResult
     {
-        string Name { get; set; }
+        string? Name { get; set; }
+
         TimeSpan Duration { get; }
-        string ExceptionMessage { get; }
+
         string Status { get; }
+
+        ExceptionInfo ExceptionInfo { get; }
 
         void End();
     }

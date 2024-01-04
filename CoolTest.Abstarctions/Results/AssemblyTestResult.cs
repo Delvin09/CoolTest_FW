@@ -1,13 +1,10 @@
 ﻿using CoolTest.Abstarctions.TestResults;
-using System.Linq;
 
 namespace CoolTest.Abstarctions.Results
 {
     public class AssemblyTestResult : SingleTestResult
     {
-        public List<GroupTestResult> GroupList = new List<GroupTestResult>();
-
-        public GroupTestResult[] Results { get { return GroupList.ToArray<GroupTestResult>(); } }
+        public List<GroupTestResult> GroupList { get; private set; } = new List<GroupTestResult>();
 
         public AssemblyTestResult() : base() { }
 

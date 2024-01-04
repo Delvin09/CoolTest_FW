@@ -12,7 +12,7 @@ namespace CoolTest.Core
 
         private readonly Assembly _assembly;
 
-        public string ModuleName { get { return _assembly.ManifestModule.Name; }}
+        public string? ModuleName { get { return _assembly.FullName; }}
 
         public TestProvider(string assemblyPath)
         {
