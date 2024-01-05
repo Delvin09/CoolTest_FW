@@ -41,5 +41,10 @@ namespace CoolTest.Core
             testResult.End();
             return testResult;
         }
+
+        ~TestEngine()
+        {
+            _logger.Dispose();
+        }
     }
 }
