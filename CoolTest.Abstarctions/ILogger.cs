@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CoolTest.Core.Logger
 {
-    public interface ILogger
+    public interface ILogger : IDisposable
     {
         public void LogInfo(string message);
 
