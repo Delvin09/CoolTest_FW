@@ -1,10 +1,14 @@
 ﻿using CoolTest.Core.Logger;
 using CoolTest.Abstarctions.Results;
+using CoolTest.Abstarctions;
 
 namespace CoolTest.Core
 {
     public class TestEngine
     {
+        public delegate void BeforeTestEventHandler(object sender, TestEventArgs e);
+        public delegate void AfterTestEventHandler(object sender, AfterTestEventArgs e);
+
         private readonly ILogger _logger;
 
         public TestEngine(ILogger logger) {
@@ -40,6 +44,28 @@ namespace CoolTest.Core
             }
             testResult.End();
             return testResult;
+        }
+
+        public event BeforeTestEventHandler BeforeTest;
+        public event AfterTestEventHandler AfterTest;
+
+        public void OnBeforeTest(TestEventArgs e)
+            => BeforeTest?.Invoke(this, e);
+
+        public void OnAfterTest(AfterTestEventArgs e)
+            => AfterTest?.Invoke(this, e);
+
+
+        public class TestEventArgs : EventArgs
+        {
+            public string AssemblyName { get; set; }
+            public string GroupName { get; set; }
+            public string TestName { get; set; }
+        }
+
+        public class AfterTestEventArgs : TestEventArgs
+        {
+            public TestState Result { get; set; }
         }
     }
 }
