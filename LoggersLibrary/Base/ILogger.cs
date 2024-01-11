@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CoolTest.Core.Logger
+namespace LoggersLibrary.Base
 {
     public interface ILogger : IDisposable
     {

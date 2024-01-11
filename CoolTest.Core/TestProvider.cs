@@ -1,5 +1,5 @@
 ﻿using CoolTest.Abstarctions;
-using CoolTest.Core.Logger;
+using LoggersLibrary.Base;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.Loader;

@@ -2,41 +2,31 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using LoggersLibrary.Base;
 
-namespace CoolTest.Core.Logger
+namespace LoggersLibrary.Loggers
 {
-    public class Logger : ILogger
+    public class FileLogger : ILogger
     {
-        private const string logLineDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
-        private const string fileDateTimeFormat = "yyyy-MM-dd HHmmss";
-        public enum MessageLevel
-        {
-            ERROR = 1,
-            WARNING,
-            INFO,
-        }
-
         private FileStream _stream;
         private MessageLevel _messageLoggingLevel;
-        public Logger(MessageLevel messageLoggingLevel = MessageLevel.INFO)
+        public FileLogger(MessageLevel messageLoggingLevel = MessageLevel.INFO)
         {
             var logPath = Environment.CurrentDirectory;
 
             _messageLoggingLevel = messageLoggingLevel;
 
-            _stream = File.OpenWrite(Path.Combine(logPath, $"log_{DateTime.Now.ToString(fileDateTimeFormat)}.txt"));
+            _stream = File.OpenWrite(Path.Combine(logPath, $"log_{DateTime.Now.ToString(LoggersConstants.FileDateTimeFormat)}.txt"));
         }
 
         public void Dispose() { _stream.Dispose(); }
 
-        private void logMessageLevel (string msg, MessageLevel level)
+        private void logMessageLevel(string msg, MessageLevel level)
         {
             if (_messageLoggingLevel <= level)
             {
-                string log = String.Join(" | ", DateTime.Now.ToString(logLineDateTimeFormat), $"[{level}]", msg) + Environment.NewLine;
-                Console.Write(log);
-                if(_stream != null && _stream.CanWrite)
+                string log = string.Join(" | ", DateTime.Now.ToString(LoggersConstants.LogLineDateTimeFormat), $"[{level}]", msg) + Environment.NewLine;
+                if (_stream != null && _stream.CanWrite)
                 {
                     _stream.Write(Encoding.UTF8.GetBytes(log));
                 }
@@ -48,7 +38,6 @@ namespace CoolTest.Core.Logger
             if (_messageLoggingLevel <= level)
             {
                 logMessageLevel(ex.Message, level);
-                Console.WriteLine(ex.StackTrace);
                 if (_stream != null && _stream.CanWrite && ex.StackTrace != null)
                 {
                     _stream.Write(Encoding.UTF8.GetBytes(ex.StackTrace));
