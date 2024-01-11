@@ -1,14 +1,14 @@
-﻿using CoolTest.Core.Logger;
+﻿using LoggersLibrary.Base;
 using CoolTest.Abstarctions.Results;
 
 namespace CoolTest.Core
 {
-    public class TestEngine
+    public class TestEngine: IDisposable
     {
         private readonly ILogger _logger;
 
-        public TestEngine(ILogger logger) {
-            _logger = logger;
+        public TestEngine(ILoggerProvider loggerProvider) {
+            _logger = loggerProvider.GetLogger();
         }
 
         public TestResult Run(string[] assemblies)
@@ -40,6 +40,11 @@ namespace CoolTest.Core
             }
             testResult.End();
             return testResult;
+        }
+
+        public void Dispose()
+        {
+            _logger.Dispose();
         }
     }
 }

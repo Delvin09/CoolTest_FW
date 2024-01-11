@@ -1,4 +1,4 @@
-using CoolTest.Core.Logger;
+using LoggersLibrary.Base;
 using System.Collections.Immutable;
 using CoolTest.Abstarctions.Results;
 
