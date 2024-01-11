@@ -3,7 +3,7 @@ using CoolTest.Abstarctions.Results;
 
 namespace CoolTest.Core
 {
-    public class TestEngine
+    public class TestEngine: IDisposable
     {
         private readonly ILogger _logger;
 
@@ -42,7 +42,7 @@ namespace CoolTest.Core
             return testResult;
         }
 
-        ~TestEngine()
+        public void Dispose()
         {
             _logger.Dispose();
         }

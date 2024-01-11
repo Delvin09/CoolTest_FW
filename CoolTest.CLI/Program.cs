@@ -10,7 +10,7 @@ namespace CoolTest.CLI
         {
             var loggerProvider = new LoggerProvider();
             loggerProvider.Registration(() => new ConsoleLogger()).Registration(() => new FileLogger());
-            var engine = new Core.TestEngine(loggerProvider);
+            using var engine = new Core.TestEngine(loggerProvider);
             TestResult testResult = engine.Run(args);
             testResult.SaveToFile();
         }
