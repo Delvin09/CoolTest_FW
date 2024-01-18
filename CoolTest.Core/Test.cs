@@ -3,6 +3,8 @@ using CoolTest.Abstarctions.Results;
 using CoolTest.Abstarctions;
 using System.Reflection;
 using static System.Net.Mime.MediaTypeNames;
+using static CoolTest.Core.TestEngine;
+using System.ComponentModel;
 
 namespace CoolTest.Core
 {
@@ -11,7 +13,6 @@ namespace CoolTest.Core
         private readonly ILogger _logger;
         private readonly string _assemblyName;
         private readonly string _groupName;
-        private readonly TestEngine _testEngine;
 
         public Test(string name, MethodInfo method, ILogger logger, string assemblyName, string groupName)
         {
@@ -20,20 +21,28 @@ namespace CoolTest.Core
             _logger = logger;
             _assemblyName = assemblyName;
             _groupName = groupName;
-
         }
 
         public string Name { get; }
 
         public MethodInfo Method { get; }
 
-        public SingleTestResult Run(object subject)
+        public event EventHandler<TestEventArgs> BeforeTest;
+
+        public event EventHandler<AfterTestEventArgs> AfterTest;
+
+        public MethodInfo GetMethod()
+        {
+            return Method;
+        }
+
+        public SingleTestResult Run(object subject, MethodInfo method)
         {
             return TestResult.Create<SingleTestResult>(Method.Name, testResult =>
             {
-                var startTest = new TestEngine.TestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name };
-
-                _testEngine.OnBeforeTest(startTest);
+                TestEventArgs? startTest = new TestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name };
+                
+                OnBeforeTest(startTest);
 
                 try
                 {
@@ -42,8 +51,8 @@ namespace CoolTest.Core
                     Method.Invoke(subject, null);
                     testResult.TestState = TestState.Success;
                     _logger.LogInfo($"Finish test {Method.Name}");
-                    var afterTest = new TestEngine.AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Success };
-                    _testEngine.OnAfterTest(afterTest);
+                    var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Success };
+                    OnAfterTest(afterTest);
                     return testResult;
                 }
                 catch (TargetInvocationException ex)
@@ -53,15 +62,15 @@ namespace CoolTest.Core
                     {
                         testResult.TestState = TestState.Failed;
                         testResult.Exception = ex.InnerException;
-                        var afterTest = new TestEngine.AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Failed };
-                        _testEngine.OnAfterTest(afterTest);
+                        var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Failed };
+                        OnAfterTest(afterTest);
                     }
                     else
                     {
                         testResult.TestState = TestState.Error;
                         testResult.Exception = ex;
-                        var afterTest = new TestEngine.AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Error };
-                        _testEngine.OnAfterTest(afterTest);
+                        var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Error };
+                        OnAfterTest(afterTest);
                     }
                     return testResult;
                 }
@@ -70,11 +79,17 @@ namespace CoolTest.Core
                     _logger.LogError(ex);
                     testResult.TestState = TestState.Error;
                     testResult.Exception = ex;
-                    var afterTest = new TestEngine.AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Error };
-                    _testEngine.OnAfterTest(afterTest);
+                    var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Error };
+                    OnAfterTest(afterTest);
                     return testResult;
                 }
             });
         }
+
+        public void OnBeforeTest(TestEventArgs e)
+           => BeforeTest?.Invoke(this, e);
+
+        public void OnAfterTest(AfterTestEventArgs e)
+            => AfterTest?.Invoke(this, e);
     }
 }

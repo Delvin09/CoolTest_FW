@@ -1,14 +1,12 @@
 ﻿using CoolTest.Core.Logger;
 using CoolTest.Abstarctions.Results;
 using CoolTest.Abstarctions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace CoolTest.Core
 {
     public class TestEngine
     {
-        public delegate void BeforeTestEventHandler(object sender, TestEventArgs e);
-        public delegate void AfterTestEventHandler(object sender, AfterTestEventArgs e);
-
         private readonly ILogger _logger;
 
         public TestEngine(ILogger logger) {
@@ -30,9 +28,16 @@ namespace CoolTest.Core
                         var testGroups = provider.GetTests();
                         foreach (var group in testGroups)
                         {
+                                group.BeforeTest += OnBeforeTest;
+                                group.AfterTest += OnAfterTest;
+
                             _logger.LogInfo($"Run tests for test group {group}");
                             GroupTestResult groupTest = group.Run(group.Name);
-                            assemblyTest.GroupList.Add(groupTest);
+
+                                group.BeforeTest -= OnBeforeTest;
+                                group.AfterTest -= OnAfterTest;
+
+                                assemblyTest.GroupList.Add(groupTest);
                             _logger.LogInfo($"Finished tests for test group {group}");
                         }
 
@@ -46,26 +51,13 @@ namespace CoolTest.Core
             return testResult;
         }
 
-        public event BeforeTestEventHandler BeforeTest;
-        public event AfterTestEventHandler AfterTest;
+        public event EventHandler BeforeTest;
+        public event EventHandler AfterTest;
 
-        public void OnBeforeTest(TestEventArgs e)
+        public void OnBeforeTest(object? sender, TestEventArgs e)
             => BeforeTest?.Invoke(this, e);
 
-        public void OnAfterTest(AfterTestEventArgs e)
+        public void OnAfterTest(object? sender, AfterTestEventArgs e)
             => AfterTest?.Invoke(this, e);
-
-
-        public class TestEventArgs : EventArgs
-        {
-            public string AssemblyName { get; set; }
-            public string GroupName { get; set; }
-            public string TestName { get; set; }
-        }
-
-        public class AfterTestEventArgs : TestEventArgs
-        {
-            public TestState Result { get; set; }
-        }
     }
 }
