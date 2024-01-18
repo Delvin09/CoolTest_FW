@@ -1,7 +1,6 @@
 ﻿using CoolTest.Core.Logger;
 using CoolTest.Abstarctions.Results;
 using CoolTest.Abstarctions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CoolTest.Core
 {
@@ -9,7 +8,8 @@ namespace CoolTest.Core
     {
         private readonly ILogger _logger;
 
-        public TestEngine(ILogger logger) {
+        public TestEngine(ILogger logger)
+        {
             _logger = logger;
         }
 
@@ -24,26 +24,28 @@ namespace CoolTest.Core
                 {
                     AssemblyTestResult assemblyTestResult = TestResult.Create<AssemblyTestResult>(provider.ModuleName, assemblyTest =>
                         {
-
-                        var testGroups = provider.GetTests();
-                        foreach (var group in testGroups)
-                        {
+                            var testGroups = provider.GetTests();
+                            foreach (var group in testGroups)
+                            {
                                 group.BeforeTest += OnBeforeTest;
                                 group.AfterTest += OnAfterTest;
+                                try
+                                {
+                                    _logger.LogInfo($"Run tests for test group {group}");
+                                    GroupTestResult groupTest = group.Run(group.Name);
 
-                            _logger.LogInfo($"Run tests for test group {group}");
-                            GroupTestResult groupTest = group.Run(group.Name);
+                                    assemblyTest.GroupList.Add(groupTest);
+                                    _logger.LogInfo($"Finished tests for test group {group}");
+                                }
+                                finally
+                                {
+                                    group.BeforeTest -= OnBeforeTest;
+                                    group.AfterTest -= OnAfterTest;
+                                }
+                            }
 
-                                group.BeforeTest -= OnBeforeTest;
-                                group.AfterTest -= OnAfterTest;
-
-                                assemblyTest.GroupList.Add(groupTest);
-                            _logger.LogInfo($"Finished tests for test group {group}");
-                        }
-
-                        return assemblyTest;
-
-                    });
+                            return assemblyTest;
+                        });
                     testResult.AssemblyList.Add(assemblyTestResult);
                 }
             }
@@ -51,13 +53,20 @@ namespace CoolTest.Core
             return testResult;
         }
 
-        public event EventHandler BeforeTest;
-        public event EventHandler AfterTest;
+        public event EventHandler<TestEventArgs>? BeforeTest;
+        public event EventHandler<AfterTestEventArgs>? AfterTest;
 
         public void OnBeforeTest(object? sender, TestEventArgs e)
-            => BeforeTest?.Invoke(this, e);
+        {
+            _logger.LogInfo($"Before test event invoke: {e}");
+            BeforeTest?.Invoke(this, e);
+        }
+
 
         public void OnAfterTest(object? sender, AfterTestEventArgs e)
-            => AfterTest?.Invoke(this, e);
+        {
+            _logger.LogInfo($"After test event invoke: {e}");
+            AfterTest?.Invoke(this, e);
+        }
     }
 }

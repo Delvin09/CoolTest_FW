@@ -2,9 +2,6 @@ using CoolTest.Core.Logger;
 using CoolTest.Abstarctions.Results;
 using CoolTest.Abstarctions;
 using System.Reflection;
-using static System.Net.Mime.MediaTypeNames;
-using static CoolTest.Core.TestEngine;
-using System.ComponentModel;
 
 namespace CoolTest.Core
 {
@@ -27,9 +24,9 @@ namespace CoolTest.Core
 
         public MethodInfo Method { get; }
 
-        public event EventHandler<TestEventArgs> BeforeTest;
+        public event EventHandler<TestEventArgs>? BeforeTest;
 
-        public event EventHandler<AfterTestEventArgs> AfterTest;
+        public event EventHandler<AfterTestEventArgs>? AfterTest;
 
         public MethodInfo GetMethod()
         {
@@ -40,8 +37,9 @@ namespace CoolTest.Core
         {
             return TestResult.Create<SingleTestResult>(Method.Name, testResult =>
             {
+                TestState resultState = TestState.Pending;
+
                 TestEventArgs? startTest = new TestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name };
-                
                 OnBeforeTest(startTest);
 
                 try
@@ -49,10 +47,8 @@ namespace CoolTest.Core
                     _logger.LogInfo($"Run test {Method.Name}");
                     testResult.TestState = TestState.Pending;
                     Method.Invoke(subject, null);
-                    testResult.TestState = TestState.Success;
+                    testResult.TestState = resultState = TestState.Success;
                     _logger.LogInfo($"Finish test {Method.Name}");
-                    var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Success };
-                    OnAfterTest(afterTest);
                     return testResult;
                 }
                 catch (TargetInvocationException ex)
@@ -60,28 +56,27 @@ namespace CoolTest.Core
                     _logger.LogError(ex);
                     if (ex.InnerException is AssertFailException)
                     {
-                        testResult.TestState = TestState.Failed;
+                        testResult.TestState = resultState = TestState.Failed;
                         testResult.Exception = ex.InnerException;
-                        var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Failed };
-                        OnAfterTest(afterTest);
                     }
                     else
                     {
-                        testResult.TestState = TestState.Error;
+                        testResult.TestState = resultState = TestState.Error;
                         testResult.Exception = ex;
-                        var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Error };
-                        OnAfterTest(afterTest);
                     }
                     return testResult;
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex);
-                    testResult.TestState = TestState.Error;
+                    testResult.TestState = resultState = TestState.Error;
                     testResult.Exception = ex;
-                    var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = TestState.Error };
-                    OnAfterTest(afterTest);
                     return testResult;
+                }
+                finally
+                {
+                    var afterTest = new AfterTestEventArgs { AssemblyName = _assemblyName, GroupName = _groupName, TestName = Name, Result = resultState };
+                    OnAfterTest(afterTest);
                 }
             });
         }

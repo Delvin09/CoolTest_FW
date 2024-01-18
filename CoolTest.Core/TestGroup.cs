@@ -22,10 +22,9 @@ namespace CoolTest.Core
 
         public ImmutableArray<Test> Tests { get; init; }
 
-        public event EventHandler<TestEventArgs> BeforeTest;
+        public event EventHandler<TestEventArgs>? BeforeTest;
 
-        public event EventHandler<AfterTestEventArgs> AfterTest;
-
+        public event EventHandler<AfterTestEventArgs>? AfterTest;
 
         public GroupTestResult Run(string name)
         {
@@ -36,19 +35,24 @@ namespace CoolTest.Core
                     test.BeforeTest += OnBeforeTest;
                     test.AfterTest += OnAfterTest;
 
-                    var subject = Activator.CreateInstance(Type);
-                    if (subject == null)
+                    try
                     {
-                        var ex = new InvalidOperationException("Can't create the object of test class!");
-                        _logger.LogError(ex);
-                        throw ex;
+                        var subject = Activator.CreateInstance(Type);
+                        if (subject == null)
+                        {
+                            var ex = new InvalidOperationException("Can't create the object of test class!");
+                            _logger.LogError(ex);
+                            throw ex;
+                        }
+                        SingleTestResult testResult = test.Run(subject, test.GetMethod());
+                        groupTest.TestList.Add(testResult);
                     }
-                    SingleTestResult testResult = test.Run(subject, test.GetMethod());
-
-                    test.BeforeTest -= OnBeforeTest;
-                    test.AfterTest -= OnAfterTest;
-
-                    groupTest.TestList.Add(testResult);
+                    finally
+                    {
+                        test.BeforeTest -= OnBeforeTest;
+                        test.AfterTest -= OnAfterTest;
+                    }
+                    
                 }
                 return groupTest;
             });
