@@ -1,6 +1,7 @@
 using LoggersLibrary.Base;
 using System.Collections.Immutable;
 using CoolTest.Abstarctions.Results;
+using CoolTest.Abstarctions;
 
 namespace CoolTest.Core
 {
@@ -21,25 +22,46 @@ namespace CoolTest.Core
 
         public ImmutableArray<Test> Tests { get; init; }
 
+        public event EventHandler<TestEventArgs>? BeforeTest;
+
+        public event EventHandler<AfterTestEventArgs>? AfterTest;
+
         public GroupTestResult Run(string name)
         {
             return TestResult.Create<GroupTestResult>(name, groupTest =>
             {
                 foreach (var test in Tests)
                 {
-                    var subject = Activator.CreateInstance(Type);
-                    if (subject == null)
-                    {
-                        var ex = new InvalidOperationException("Can't create the object of test class!");
-                        _logger.LogError(ex);
-                        throw ex;
-                    }
-                    SingleTestResult testResult = test.Run(subject);
+                    test.BeforeTest += OnBeforeTest;
+                    test.AfterTest += OnAfterTest;
 
-                    groupTest.TestList.Add(testResult);
+                    try
+                    {
+                        var subject = Activator.CreateInstance(Type);
+                        if (subject == null)
+                        {
+                            var ex = new InvalidOperationException("Can't create the object of test class!");
+                            _logger.LogError(ex);
+                            throw ex;
+                        }
+                        SingleTestResult testResult = test.Run(subject, test.GetMethod());
+                        groupTest.TestList.Add(testResult);
+                    }
+                    finally
+                    {
+                        test.BeforeTest -= OnBeforeTest;
+                        test.AfterTest -= OnAfterTest;
+                    }
+                    
                 }
                 return groupTest;
             });
         }
+
+        public void OnBeforeTest(object? sender, TestEventArgs e)
+           => BeforeTest?.Invoke(this, e);
+
+        public void OnAfterTest(object? sender, AfterTestEventArgs e)
+            => AfterTest?.Invoke(this, e);
     }
 }

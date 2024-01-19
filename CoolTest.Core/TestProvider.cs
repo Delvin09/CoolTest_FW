@@ -7,7 +7,7 @@ using System.Runtime.Loader;
 namespace CoolTest.Core
 {
     internal class TestProvider : IDisposable
-    {
+    {                                                               
         private readonly string _assemblyPath;
         private readonly AssemblyLoadContext _context;
 
@@ -51,7 +51,7 @@ namespace CoolTest.Core
                     {
                         Tests = t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                                 .Where(m => m.GetCustomAttribute<TestAttribute>() != null)
-                                .Select(m => new Test(m.GetCustomAttribute<TestAttribute>()?.Name ?? m.Name, m, _logger))
+                                .Select(m => new Test(m.GetCustomAttribute<TestAttribute>()?.Name ?? m.Name, m, _logger, _assembly?.GetName()?.ToString()!, t.Name))
                                 .ToImmutableArray()
                     }
                 );
