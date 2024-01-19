@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoolTest.Core\CoolTest.Core.csproj" />
+    <ProjectReference Include="..\LoggersLibrary\LoggersLibrary.csproj" />
   </ItemGroup>
 
 </Project>

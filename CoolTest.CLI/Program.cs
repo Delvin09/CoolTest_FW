@@ -1,5 +1,6 @@
-﻿using CoolTest.Core.Logger;
+﻿using LoggersLibrary.Loggers;
 using CoolTest.Abstarctions.Results;
+using LoggersLibrary;
 
 namespace CoolTest.CLI
 {
@@ -7,7 +8,9 @@ namespace CoolTest.CLI
     {
         static void Main(string[] args)
         {
-            var engine = new Core.TestEngine(new Logger());
+            var loggerProvider = new LoggerProvider();
+            loggerProvider.Registration(() => new ConsoleLogger()).Registration(() => new FileLogger());
+            using var engine = new Core.TestEngine(loggerProvider);
             TestResult testResult = engine.Run(args);
             testResult.SaveToFile();
         }

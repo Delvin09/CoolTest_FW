@@ -1,16 +1,15 @@
-﻿using CoolTest.Core.Logger;
+﻿using LoggersLibrary.Base;
 using CoolTest.Abstarctions.Results;
 using CoolTest.Abstarctions;
 
 namespace CoolTest.Core
 {
-    public class TestEngine
+    public class TestEngine: IDisposable
     {
         private readonly ILogger _logger;
 
-        public TestEngine(ILogger logger)
-        {
-            _logger = logger;
+        public TestEngine(ILoggerProvider loggerProvider) {
+            _logger = loggerProvider.GetLogger();
         }
 
         public TestResult Run(string[] assemblies)
@@ -67,6 +66,11 @@ namespace CoolTest.Core
         {
             _logger.LogInfo($"After test event invoke: {e}");
             AfterTest?.Invoke(this, e);
+        }
+
+        public void Dispose()
+        {
+            _logger.Dispose();
         }
     }
 }
